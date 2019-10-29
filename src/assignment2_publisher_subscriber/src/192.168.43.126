@@ -1,0 +1,20 @@
+import rospy
+
+from autominy_msgs import autominy_msgs SpeedCommand
+from autominy_msgs import autominy_msgs NormalizedSteeringCommand
+
+def driveCommand():
+	pub = rospy.Publisher('actuators/steering_normalized')
+	rospy.init_node('driveCommand', anonymous = True)
+	rate = rospy.Rate(10)
+	while not rospy.is_shutdown():
+		steeringCommand = 1.0
+		rospy.loginfo(steeringCommand)
+		pub.publish(steeringCommand)
+		rate.sleep
+
+if __name__ == '__main__':
+	try:
+		driveCommand()
+	except rospy.ROSInterruptException:
+		pass
