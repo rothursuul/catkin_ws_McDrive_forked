@@ -18,7 +18,7 @@ get_current_steering_angle()
 print("Test: The Current_Steering_Angle is: ", steeringAngle)
 #------------------------------------------------------------------------------------
 
-#---Subscribe to the current position---
+#---Subscribe to the current position------------------------------------------------
 currentPosition_x = 0
 currentPosition_y = 0
 currentPosition_z = 0
@@ -37,9 +37,9 @@ def get_current_position():
     rospy.sleep(1)
 get_current_position()
 print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
-#----------------------------------------
+#------------------------------------------------------------------------------------
 
-#---Starting the calibration---
+#---Starting the calibration---------------------------------------------------------
 #Values and Publishers
 speed = SpeedCommand()
 speed.value = 0.2
