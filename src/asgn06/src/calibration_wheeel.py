@@ -58,8 +58,9 @@ print("Starting at:", "x:", currentPosition_x, "y:", currentPosition_y, "z:", cu
 
 #Going straight
 stop_position = currentPosition_x - 1
+print("straight")
+print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 while currentPosition_x > stop_position:
-    print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
     ticks_counted[0] = ticks_counted[0] + current_ticks
     steering.value = 0
     steeringPublisher.publish(steering)
@@ -67,28 +68,35 @@ while currentPosition_x > stop_position:
     speedPublisher.publish(speed)
 print(ticks_counted)
 stop_car()
+print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 
-error_margin = 0.2
+error_margin = 0.10
 #Going left
+print("left")
+print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 stop_position_x, stop_position_y = calculate_circle_stop(currentPosition_x, currentPosition_y, "left")
-while not ((stop_position_x - error_margin < currentPosition_x < stop_position_x + error_margin) and (stop_position_y - error_margin < currentPosition_y < stop_position_y + error_margin)):
-    print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
+print("stop_x:", stop_position_x, "stop_y:", stop_position_y)
+while not ((stop_position_x - error_margin <= currentPosition_x <= stop_position_x + error_margin) and (stop_position_y - error_margin <= currentPosition_y <= stop_position_y + error_margin)):
     ticks_counted[1] = ticks_counted[1] + current_ticks
     steering.value = 1.0
     steeringPublisher.publish(steering)
     speed.value = 0.2
     speedPublisher.publish(speed)
 stop_car()
+print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 
 #Going right
+print("right")
+print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 stop_position_x, stop_position_y = calculate_circle_stop(currentPosition_x, currentPosition_y, "right")
-while not ((stop_position_x - error_margin < currentPosition_x < stop_position_x + error_margin) and (stop_position_y - error_margin < currentPosition_y < stop_position_y + error_margin)):
-    print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
+print("stop_x:", stop_position_x, "stop_y:", stop_position_y)
+while not ((stop_position_x - error_margin <= currentPosition_x <= stop_position_x + error_margin) and (stop_position_y - error_margin <= currentPosition_y <= stop_position_y + error_margin)):
     ticks_counted[2] = ticks_counted[2] + current_ticks
     steering.value = -1.0
     steeringPublisher.publish(steering)
     speed.value = 0.2
     speedPublisher.publish(speed)
 stop_car()
+print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 
 print("0:", ticks_counted[0], "1:",ticks_counted[1], "2:", ticks_counted[2])
