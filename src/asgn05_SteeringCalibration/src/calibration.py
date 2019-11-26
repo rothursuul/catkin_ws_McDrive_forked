@@ -33,7 +33,7 @@ def callback_position(data):
 
 
 def get_current_position():
-    rospy.Subscriber("/communication/gps/11", Odometry, callback_position)
+    rospy.Subscriber("/communication/gps/5", Odometry, callback_position)
     rospy.sleep(1)
 get_current_position()
 print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
