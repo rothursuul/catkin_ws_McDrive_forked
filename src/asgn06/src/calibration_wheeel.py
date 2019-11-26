@@ -68,9 +68,10 @@ while currentPosition_x > stop_position:
 print(ticks_counted)
 stop_car()
 
+error_margin = 0.2
 #Going left
 stop_position_x, stop_position_y = calculate_circle_stop(currentPosition_x, currentPosition_y, "left")
-while not ((stop_position_x - 0.3 < currentPosition_x < stop_position_x + 0.3) and (stop_position_y - 0.3 < currentPosition_y < stop_position_y + 0.3)):
+while not ((stop_position_x - error_margin < currentPosition_x < stop_position_x + error_margin) and (stop_position_y - error_margin < currentPosition_y < stop_position_y + error_margin)):
     print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
     ticks_counted[1] = ticks_counted[1] + current_ticks
     steering.value = 1.0
@@ -81,7 +82,7 @@ stop_car()
 
 #Going right
 stop_position_x, stop_position_y = calculate_circle_stop(currentPosition_x, currentPosition_y, "right")
-while not ((stop_position_x - 0.3 < currentPosition_x < stop_position_x + 0.3) and (stop_position_y - 0.3 < currentPosition_y < stop_position_y + 0.3)):
+while not ((stop_position_x - error_margin < currentPosition_x < stop_position_x + error_margin) and (stop_position_y - error_margin < currentPosition_y < stop_position_y + error_margin)):
     print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
     ticks_counted[2] = ticks_counted[2] + current_ticks
     steering.value = -1.0
