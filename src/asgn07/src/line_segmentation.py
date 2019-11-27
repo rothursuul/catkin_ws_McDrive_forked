@@ -20,7 +20,7 @@ def callback(data):
 #Getting the data from the bagfile
 rospy.init_node("line_segmentation", anonymous=False)
 rospy.Subscriber("/sensors/camera/infra1/image_rect_raw", Image, callback)
-#imagePublisher = rospy.Publisher(image, Image, queue_size=10)
+imagePublisher = rospy.Publisher("image_segmented", Image, queue_size=10)
 rospy.sleep(1)
 
 #Working on the Image
@@ -28,10 +28,16 @@ print(type(image))
 print(encoding)
 #print(image)
 cv_image = bridge.imgmsg_to_cv2(image, encoding)
-cv.imshow("Image window", cv_image)
-cv.waitKey(0)
+#cv.imshow("Image window", cv_image)
+#cv.waitKey(0)
 
 #Segmenting the image for white lines
-#ret, thresh_bin = cv.threshold(image,254,255,cv.THRESH_BINARY)
+ret, thresh_bin = cv.threshold(cv_image,254,255,cv.THRESH_BINARY)
+#Setting upper and lower part to zero and showing the resulting image
+thresh_bin[:150,:] = 0
+thresh_bin[320:,:] = 0
 #plt.imshow(thresh_bin, 'gray')
 #plt.show()
+
+imagePublisher.publish(bridge.cv2_to_imgmsg(cv_image, encoding))
+rospy.spin()
