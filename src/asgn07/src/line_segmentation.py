@@ -12,10 +12,10 @@ image = Image()
 encoding = ""
 bridge = CvBridge()
 def callback(data):
-    global image
-    global encoding
-    encoding = data.encoding
-    image = data
+	global image
+	global encoding
+	encoding = data.encoding
+	image = data
 
 #Getting the data from the bagfile
 rospy.init_node("line_segmentation", anonymous=False)
@@ -53,12 +53,12 @@ imagePublisher.publish(bridge.cv2_to_imgmsg(cv_image, encoding))
 
 #RANSAC
 def get_point_lib(A):
-    res = []
-    for x in range(len(A-1)):
-        for y in range (len(A[x]-1)):
-            if A[x,y] == 255:
-                res.append([x,y])
-    return np.array(res)
+	res = []
+	for x in range(len(A-1)):
+		for y in range (len(A[x]-1)):
+			if A[x,y] == 255:
+				res.append([x,y])
+	return np.array(res)
 
 print(get_point_lib(cropped_image))
 
@@ -72,6 +72,8 @@ N = 1e10
 sample_count = 0
 while N > sample_count:
 	#choosing random sample and computing linear fit parameters
+	x_vals = white_pixels[:,None]
+	y_vals = white_pixels[None,:]
 	num_points = len(white_pixels)
 	idx1 = np.random.randint(0,num_points)
 	idx2 = np.random.randint(0,num_points)
@@ -80,7 +82,7 @@ while N > sample_count:
 	m,b = linear_fit(p1,p2)
 
 	#number of inliers
-	sigma = np.sqrt(np.mean(np.abs(x - x.np.mean()) ** 2))
+	sigma = np.sqrt(np.mean(np.abs(x_vals - x_vals.mean()) ** 2))
 	t = np.sqrt(3.84 * sigma)
 	y_model = m*white_pixels[:,0]+b
 	num_inliers = 0
