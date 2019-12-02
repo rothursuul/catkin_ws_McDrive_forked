@@ -34,6 +34,7 @@ cv_image = bridge.imgmsg_to_cv2(image, encoding)
 #Segmenting the image for white lines
 ret, thresh_bin = cv.threshold(cv_image,254,255,cv.THRESH_BINARY)
 <<<<<<< HEAD
+<<<<<<< HEAD
 #Crop
 cropped_image = thresh_bin[170:320, 100:500]
 # plt.imshow(cropped_image, 'gray')
@@ -44,6 +45,8 @@ imagePublisher.publish(bridge.cv2_to_imgmsg(cropped_image, encoding))
 
 #---------------------------------------------------------------------
 
+=======
+>>>>>>> 6263a64dcbc42d067bf0920a5488fccd1bdcbf35
 #Setting upper and lower part to zero and showing the resulting image
 thresh_bin[:150,:] = 0
 thresh_bin[320:,:] = 0
@@ -53,7 +56,10 @@ plt.show()
 imagePublisher.publish(bridge.cv2_to_imgmsg(cv_image, encoding))
 rospy.spin()
 
-#RANSAC
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6263a64dcbc42d067bf0920a5488fccd1bdcbf35
 def linear_fit(p1,p2):
 	m = (p2[1]-p1[1])/(p2[0]-p1[0])
 	b = p1[1]-m*p1[0]
@@ -85,3 +91,8 @@ while N > sample_count:
 	N = np.log(1-p)/np.log(1-(1-e)**s)
 	sample_count +=1
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 6263a64dcbc42d067bf0920a5488fccd1bdcbf35
