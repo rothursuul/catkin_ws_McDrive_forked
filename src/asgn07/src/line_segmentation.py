@@ -33,11 +33,22 @@ cv_image = bridge.imgmsg_to_cv2(image, encoding)
 
 #Segmenting the image for white lines
 ret, thresh_bin = cv.threshold(cv_image,254,255,cv.THRESH_BINARY)
-#Setting upper and lower part to zero and showing the resulting image
-thresh_bin[:150,:] = 0
-thresh_bin[320:,:] = 0
-#plt.imshow(thresh_bin, 'gray')
-#plt.show()
+#Crop
+cropped_image = thresh_bin[170:320, 100:500]
+# plt.imshow(cropped_image, 'gray')
+# plt.show()
 
-imagePublisher.publish(bridge.cv2_to_imgmsg(cv_image, encoding))
-rospy.spin()
+imagePublisher.publish(bridge.cv2_to_imgmsg(cropped_image, encoding))
+#rospy.spin()
+
+#---------------------------------------------------------------------
+#RANSAC
+def get_point_lib(A):
+    res = []
+    for x in range(len(A-1)):
+        for y in range (len(A[x]-1)):
+            if A[x,y] == 255:
+                res.append([x,y])
+    return np.array(res)
+
+print(get_point_lib(cropped_image))
