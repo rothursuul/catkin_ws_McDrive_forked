@@ -24,8 +24,8 @@ imagePublisher = rospy.Publisher("image_segmented", Image, queue_size=10)
 rospy.sleep(1)
 
 #Working on the Image
-print(type(image))
-print(encoding)
+#print(type(image))
+#print(encoding)
 #print(image)
 cv_image = bridge.imgmsg_to_cv2(image, encoding)
 #cv.imshow("Image window", cv_image)
@@ -33,8 +33,6 @@ cv_image = bridge.imgmsg_to_cv2(image, encoding)
 
 #Segmenting the image for white lines
 ret, thresh_bin = cv.threshold(cv_image,254,255,cv.THRESH_BINARY)
-<<<<<<< HEAD
-<<<<<<< HEAD
 #Crop
 cropped_image = thresh_bin[170:320, 100:500]
 # plt.imshow(cropped_image, 'gray')
@@ -45,26 +43,31 @@ imagePublisher.publish(bridge.cv2_to_imgmsg(cropped_image, encoding))
 
 #---------------------------------------------------------------------
 
-=======
->>>>>>> 6263a64dcbc42d067bf0920a5488fccd1bdcbf35
 #Setting upper and lower part to zero and showing the resulting image
-thresh_bin[:150,:] = 0
-thresh_bin[320:,:] = 0
-plt.imshow(thresh_bin, 'gray')
-plt.show()
+cropped_image = thresh_bin[170:320, 100:500]
+#plt.imshow(cropped_image, 'gray')
+#plt.show()
 
 imagePublisher.publish(bridge.cv2_to_imgmsg(cv_image, encoding))
-rospy.spin()
+#rospy.spin()
 
-<<<<<<< HEAD
-=======
+#RANSAC
+def get_point_lib(A):
+    res = []
+    for x in range(len(A-1)):
+        for y in range (len(A[x]-1)):
+            if A[x,y] == 255:
+                res.append([x,y])
+    return np.array(res)
 
->>>>>>> 6263a64dcbc42d067bf0920a5488fccd1bdcbf35
+print(get_point_lib(cropped_image))
+
 def linear_fit(p1,p2):
 	m = (p2[1]-p1[1])/(p2[0]-p1[0])
 	b = p1[1]-m*p1[0]
 	return m,b
 
+white_pixels = get_point_lib(cropped_image)
 N = 1e10
 sample_count = 0
 while N > sample_count:
@@ -77,7 +80,8 @@ while N > sample_count:
 	m,b = linear_fit(p1,p2)
 
 	#number of inliers
-	t = np.sqrt(3.84)*std_dev
+	sigma = np.sqrt(np.mean(np.abs(x - x.np.mean()) ** 2))
+	t = np.sqrt(3.84 * sigma)
 	y_model = m*white_pixels[:,0]+b
 	num_inliers = 0
 	for i in range(num_points):
@@ -90,9 +94,3 @@ while N > sample_count:
 	e = 1-(num_inliers/num_points)
 	N = np.log(1-p)/np.log(1-(1-e)**s)
 	sample_count +=1
-
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 6263a64dcbc42d067bf0920a5488fccd1bdcbf35
