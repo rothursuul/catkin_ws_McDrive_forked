@@ -53,7 +53,7 @@ plt.show()
 imagePublisher.publish(bridge.cv2_to_imgmsg(cv_image, encoding))
 rospy.spin()
 
-
+#RANSAC
 def linear_fit(p1,p2):
 	m = (p2[1]-p1[1])/(p2[0]-p1[0])
 	b = p1[1]-m*p1[0]
