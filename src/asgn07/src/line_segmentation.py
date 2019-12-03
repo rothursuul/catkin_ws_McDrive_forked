@@ -54,26 +54,36 @@ imagePublisher.publish(bridge.cv2_to_imgmsg(cv_image, encoding))
 #RANSAC
 def get_point_lib(A):
 	res = []
+	x_res = []
+	y_res = []
 	for x in range(len(A-1)):
 		for y in range (len(A[x]-1)):
 			if A[x,y] == 255:
 				res.append([x,y])
-	return np.array(res)
+				x_res.append(x)
+				y_res.append(y)
+	return np.array(res), np.array(x_res), np.array(y_res)
 
-print(get_point_lib(cropped_image))
+#print(get_point_lib(cropped_image))
 
 def linear_fit(p1,p2):
 	m = (p2[1]-p1[1])/(p2[0]-p1[0])
 	b = p1[1]-m*p1[0]
 	return m,b
 
-white_pixels = get_point_lib(cropped_image)
+white_pixel_map = get_point_lib(cropped_image)
+white_pixels = white_pixel_map[0]
+x_vals = white_pixel_map[1]
+y_vals = white_pixel_map[2]
+print(white_pixels[1])
+print(x_vals[1])
 N = 1e10
+s = 2
+p = 0.95
 sample_count = 0
+N = np.log(1 - p) / np.log(1 - (1 - e) ** s)
 while N > sample_count:
 	#choosing random sample and computing linear fit parameters
-	x_vals = white_pixels[:,None]
-	y_vals = white_pixels[None,:]
 	num_points = len(white_pixels)
 	idx1 = np.random.randint(0,num_points)
 	idx2 = np.random.randint(0,num_points)
@@ -82,17 +92,15 @@ while N > sample_count:
 	m,b = linear_fit(p1,p2)
 
 	#number of inliers
-	sigma = np.sqrt(np.mean(np.abs(x_vals - x_vals.mean()) ** 2))
+	sigma = np.sqrt(np.mean(np.abs(((x_vals - x_vals.mean()) ** 2) + ((y_vals - y_vals.mean()) ** 2))))
 	t = np.sqrt(3.84 * sigma)
-	y_model = m*white_pixels[:,0]+b
+	y_model = m*x_vals+b
 	num_inliers = 0
 	for i in range(num_points):
-		if y_model[i] < white_pixels[1,i] + t:
+		if y_model[i] < y_vals[i] + t:
 			num_inliers +=1
 
 	#recomputing N
-	s = 2
-	p = 0.95
 	e = 1-(num_inliers/num_points)
 	N = np.log(1-p)/np.log(1-(1-e)**s)
 	sample_count +=1
