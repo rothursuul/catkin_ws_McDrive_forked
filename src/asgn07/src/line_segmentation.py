@@ -1,3 +1,4 @@
+from __future__ import division
 import rospy
 import numpy as np
 import cv2 as cv
@@ -35,8 +36,8 @@ cv_image = bridge.imgmsg_to_cv2(image, encoding)
 ret, thresh_bin = cv.threshold(cv_image,254,255,cv.THRESH_BINARY)
 #Crop
 cropped_image = thresh_bin[170:320, 100:500]
-# plt.imshow(cropped_image, 'gray')
-# plt.show()
+plt.imshow(cropped_image, 'gray')
+plt.show()
 
 imagePublisher.publish(bridge.cv2_to_imgmsg(cropped_image, encoding))
 #rospy.spin()
@@ -78,10 +79,11 @@ y_vals = white_pixel_map[2]
 print(white_pixels[1])
 print(x_vals[1])
 N = 1e10
+print (N)
 s = 2
 p = 0.95
 sample_count = 0
-N = np.log(1 - p) / np.log(1 - (1 - e) ** s)
+check = 0
 while N > sample_count:
 	#choosing random sample and computing linear fit parameters
 	num_points = len(white_pixels)
@@ -99,7 +101,6 @@ while N > sample_count:
 	for i in range(num_points):
 		if y_model[i] < y_vals[i] + t:
 			num_inliers +=1
-
 	#recomputing N
 	e = 1-(num_inliers/num_points)
 	N = np.log(1-p)/np.log(1-(1-e)**s)
