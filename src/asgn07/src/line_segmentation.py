@@ -15,8 +15,8 @@ bridge = CvBridge()
 def callback(data):
 	global image
 	global encoding
-	encoding = data.encoding
 	image = data
+	encoding = data.encoding
 
 #Getting the data from the bagfile
 rospy.init_node("line_segmentation", anonymous=False)

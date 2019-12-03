@@ -41,10 +41,10 @@ print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 
 #---Starting the calibration---------------------------------------------------------
 #Values and Publishers
-speed = SpeedCommand()
-speed.value = 0.2
-steering = NormalizedSteeringCommand()
-steering.value = 1
+velocity = SpeedCommand()
+velocity.value = 0.2
+theta = NormalizedSteeringCommand()
+theta.value = 1
 
 steeringPublisher = rospy.Publisher("/actuators/steering_normalized", NormalizedSteeringCommand, queue_size=10)
 speedPublisher = rospy.Publisher("/actuators/speed", SpeedCommand, queue_size=10)
@@ -52,40 +52,40 @@ rospy.sleep(1)
 
 #1)Steering angle calibration
 #get_current_position()
-steeringPublisher.publish(steering)
-speedPublisher.publish(speed)
+steeringPublisher.publish(theta)
+speedPublisher.publish(velocity)
 rospy.sleep(3)
 print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 rospy.sleep(3)
 print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
-speed.value = 0
-speedPublisher.publish(speed)
+velocity.value = 0
+speedPublisher.publish(velocity)
 
 #2)calibration
 #2-1)leftward direction
-steering.value = 1.0
-steeringPublisher.publish(steering)
+theta.value = 1.0
+steeringPublisher.publish(theta)
 while currentPosition_y != 2.2:
-    speed.value = 0.1
-    speedPublisher.publish(speed)
-speed.value = 0.0
-speedPublisher.publish(speed)
+    velocity.value = 0.1
+    speedPublisher.publish(velocity)
+velocity.value = 0.0
+speedPublisher.publish(velocity)
 print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 
 #2-2) straight
 target_pos_1 = currentPosition_x + 2
 while currentPosition_x != target_pos_1:
-    speed.value = 0.1
-    speedPublisher.publish(speed)
-speed.value = 0.0
-speedPublisher.publish(speed)
+    velocity.value = 0.1
+    speedPublisher.publish(velocity)
+velocity.value = 0.0
+speedPublisher.publish(velocity)
 
 #2-3)leftward direction
-steering.value = -1.0
-steeringPublisher.publish(steering)
+theta.value = -1.0
+steeringPublisher.publish(theta)
 while currentPosition_y != 2.2:
-    speed.value = 0.1
-    speedPublisher.publish(speed)
-speed.value = 0.0
-speedPublisher.publish(speed)
+    velocity.value = 0.1
+    speedPublisher.publish(velocity)
+velocity.value = 0.0
+speedPublisher.publish(velocity)
 print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
