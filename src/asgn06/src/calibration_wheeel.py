@@ -6,8 +6,8 @@ from nav_msgs.msg import Odometry
 
 
 #Variables
-speed = SpeedCommand()
-steering = NormalizedSteeringCommand()
+velocity = SpeedCommand()
+theta = NormalizedSteeringCommand()
 currentPosition_x = 0
 currentPosition_y = 0
 currentPosition_z = 0
@@ -36,12 +36,12 @@ rospy.sleep(1)
 
 #Starting/Stopping the car
 def start_car():
-    speed.value = 0.2
-    speedPublisher.publish(speed)
+    velocity.value = 0.2
+    speedPublisher.publish(velocity)
 
 def stop_car():
-    speed.value = 0.0
-    speedPublisher.publish(speed)
+    velocity.value = 0.0
+    speedPublisher.publish(velocity)
 
 #Calculating the stop position for going in a circle
 def calculate_circle_stop (current_position_x, current_position_y, direction):
@@ -62,10 +62,10 @@ print("straight")
 print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 while currentPosition_x > stop_position:
     ticks_counted[0] = ticks_counted[0] + current_ticks
-    steering.value = 0
-    steeringPublisher.publish(steering)
-    speed.value = 0.2
-    speedPublisher.publish(speed)
+    theta.value = 0
+    steeringPublisher.publish(theta)
+    velocity.value = 0.2
+    speedPublisher.publish(velocity)
 print(ticks_counted)
 stop_car()
 print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
@@ -78,10 +78,10 @@ stop_position_x, stop_position_y = calculate_circle_stop(currentPosition_x, curr
 print("stop_x:", stop_position_x, "stop_y:", stop_position_y)
 while not ((stop_position_x - error_margin <= currentPosition_x <= stop_position_x + error_margin) and (stop_position_y - error_margin <= currentPosition_y <= stop_position_y + error_margin)):
     ticks_counted[1] = ticks_counted[1] + current_ticks
-    steering.value = 1.0
-    steeringPublisher.publish(steering)
-    speed.value = 0.2
-    speedPublisher.publish(speed)
+    theta.value = 1.0
+    steeringPublisher.publish(theta)
+    velocity.value = 0.2
+    speedPublisher.publish(velocity)
 stop_car()
 print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 
@@ -92,10 +92,10 @@ stop_position_x, stop_position_y = calculate_circle_stop(currentPosition_x, curr
 print("stop_x:", stop_position_x, "stop_y:", stop_position_y)
 while not ((stop_position_x - error_margin <= currentPosition_x <= stop_position_x + error_margin) and (stop_position_y - error_margin <= currentPosition_y <= stop_position_y + error_margin)):
     ticks_counted[2] = ticks_counted[2] + current_ticks
-    steering.value = -1.0
-    steeringPublisher.publish(steering)
-    speed.value = 0.2
-    speedPublisher.publish(speed)
+    theta.value = -1.0
+    steeringPublisher.publish(theta)
+    velocity.value = 0.2
+    speedPublisher.publish(velocity)
 stop_car()
 print("x:", currentPosition_x, "y:", currentPosition_y, "z:", currentPosition_z)
 
