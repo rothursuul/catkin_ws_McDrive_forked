@@ -1,9 +1,9 @@
 import rospy
 import numpy as np
+import math
 from autominy_msgs.msg import Speed, SteeringAngle
 from nav_msgs.msg import Odometry
 
-#Global Variables
 velocity = 0
 phi = 0
 l = 0.27
@@ -13,6 +13,8 @@ theta = 0
 res = Odometry()
 res.header.frame_id = "map"
 res.child_frame_id = "base_link"
+text_output = ""
+
 
 #Callback Functions for Subscriber Nodes
 def callback_velocity(data):
@@ -37,33 +39,41 @@ rospy.Subscriber("/sensors/speed", Speed, callback_velocity)
 rospy.Subscriber("/sensors/steering", SteeringAngle, callback_phi)
 rospy.Subscriber("/sensors/localization/filtered_map", Odometry, callback_map)
 odometryPublisher = rospy.Publisher("odometry_calc", Odometry, queue_size = 10)
-rospy.sleep(1)
-t0 = rospy.get_time()
+last_time = rospy.Time.now().to_sec()
+rospy.sleep(0)
+
+#Global Variables
 #print(x,y,theta)
 
-#Odometry Calculation
+#Odometry Calculatio
 def odometry_callback(event):
     global x
     global y
     global t0
     global res
+    global velocity
+    global theta
+    global phi
+    global text_output
+    global last_time
 
-    def get_velocities():
-        global velocity
-        global theta
-        global phi
-        velocity_x = velocity * np.cos(theta)
-        velocity_y = velocity * np.sin(theta)
-        velocity_theta = velocity / l * np.tan(phi)
-        return velocity_x, velocity_y, velocity_theta
+
     #print(get_velocities())
-    rospy.sleep(1)
-    t1 = rospy.get_time()
-    delta_t = t1-t0
-    res.pose.pose.position.x = x + delta_t * get_velocities()[0]
-    res.pose.pose.position.y = y + delta_t * get_velocities()[1]
-    res.pose.pose.orientation.w = theta + delta_t * get_velocities()[2]
-    odometryPublisher.publish(res)
+    delta_t = rospy.Time.now().to_sec() - last_time
+    last_time = rospy.Time.now().to_sec()
 
-rospy.Timer(rospy.Duration(0.01), odometry_callback)
+    #get velocities
+    velocity_x = velocity * np.cos(theta)
+    velocity_y = velocity * np.sin(theta)
+    velocity_theta = velocity / l * math.tan(phi)
+    print(x,y)
+    print(delta_t)
+    res.pose.pose.position.x = x + delta_t * velocity_x
+    res.pose.pose.position.y = y + delta_t * velocity_y
+    res.pose.pose.orientation.w = np.cos((theta + delta_t * velocity_theta) / 2)
+    res.pose.pose.orientation.z = np.sin((theta + delta_t * velocity_theta) / 2)
+    odometryPublisher.publish(res)
+    rospy.Rate(100).sleep()
+
+rospy.Timer(rospy.Duration(0.0001), odometry_callback, False)
 rospy.spin()
