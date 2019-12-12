@@ -5,9 +5,9 @@ from nav_msgs.msg import Odometry
 
 rospy.init_node("calibration", anonymous=False)
 #---Subscribe to the Steering_Angle Topic to get the current value for calculation---
-steeringAngle = 0
+steering_angle = 0
 def callback_steering(data):
-    global steeringAngle
+    global steering_angle
     steeringAngle = data.value
 
 def get_current_steering_angle():
@@ -15,7 +15,7 @@ def get_current_steering_angle():
     rospy.sleep(1)
 
 get_current_steering_angle()
-print("Test: The Current_Steering_Angle is: ", steeringAngle)
+print("Test: The Current_Steering_Angle is: ", steering_angle)
 #------------------------------------------------------------------------------------
 
 #---Subscribe to the current position------------------------------------------------
