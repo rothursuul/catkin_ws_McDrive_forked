@@ -45,9 +45,9 @@ error = np.abs(theta - target_angle)
 print("theta:", theta, "steering_angle:", steering_angle, "target_angle:", target_angle, "error:", error)
 velocity_angle = velocity / l * np.tan(steering_angle)
 i = 0
-kp = -0.6
-kd = -0.2
-while  error >= 0.1:
+kp = -0.1
+kd = -0.1
+while  error >= 0.05:
     error = np.abs(theta - target_angle)
     u = kp * (target_angle - theta) + kd * (0.0 - velocity_angle)
     control_signal = np.tanh(u)
