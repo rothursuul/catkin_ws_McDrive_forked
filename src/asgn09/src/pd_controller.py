@@ -39,7 +39,6 @@ rospy.sleep(1)
 
 #PD Control function
 # target_angle = input("Target angle: ")
-###!!!! The u value becomes negative for negative angles - in need of fix
 target_angle = 0
 error = np.abs(theta - target_angle)
 print("theta:", theta, "steering_angle:", steering_angle, "target_angle:", target_angle, "error:", error)
