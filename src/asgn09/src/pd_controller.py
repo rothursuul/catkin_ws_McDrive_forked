@@ -6,7 +6,6 @@ from nav_msgs.msg import Odometry
 #Variables
 x = 0
 y = 0
-theta = 0
 steering_angle = 0.0
 theta = 0.0
 velocity = 0.0
@@ -19,6 +18,7 @@ def callback_map(data):
     global theta
     x = data.pose.pose.position.x
     y = data.pose.pose.position.y
+    #muss eigentlich auch das z in betracht ziehen in c++ wäre das 2*atan2(z,w), das würde das richtige theta geben
     theta = np.arcsin(data.pose.pose.orientation.w) * 2
 
 def callback_steering(data):
@@ -44,9 +44,9 @@ error = np.abs(theta - target_angle)
 print("theta:", theta, "steering_angle:", steering_angle, "target_angle:", target_angle, "error:", error)
 velocity_angle = velocity / l * np.tan(steering_angle)
 i = 0
-kp = -0.1
-kd = -0.1
-while  error >= 0.05:
+kp = -0.4
+kd = -0.2
+while  error >= 0.03:
     error = np.abs(theta - target_angle)
     u = kp * (target_angle - theta) + kd * (0.0 - velocity_angle)
     control_signal = np.tanh(u)
