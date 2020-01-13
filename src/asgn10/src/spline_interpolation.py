@@ -43,11 +43,31 @@ rospy.sleep(1)
 
 lane1 = np.load('lane1.npy')
 lane2 = np.load('lane2.npy')
-print(lane1[0:-1:2,2])
 
-lane1_interp_x = interpolate.interp1d(lane1[0:-1:2,0], lane1[0:-1:2,1], 'cubic')
-lane1_interp_y = interpolate.interp1d(lane1[0:-1:2,0], lane1[0:-1:2,2], 'cubic')
+lane1_breakpoints = [0,209,309,539,639,847,947,1176,1276]
+lane2_breakpoints = [0,209,309,638,738,974,1047,1376,1476]
 
-lane2_interp_x = interpolate.interp1d(lane2[0:-1:2,0], lane2[0:-1:2,1], 'cubic')
-lane2_interp_y = interpolate.interp1d(lane2[0:-1:2,0], lane2[0:-1:2,2], 'cubic')
+lane1_interp_x = interpolate.interp1d(lane1[lane1_breakpoints,0], lane1[lane1_breakpoints,1], 'cubic')
+lane1_interp_y = interpolate.interp1d(lane1[lane1_breakpoints,0], lane1[lane1_breakpoints,2], 'cubic')
 
+lane2_interp_x = interpolate.interp1d(lane2[lane2_breakpoints,0], lane2[lane2_breakpoints,1], 'cubic')
+lane2_interp_y = interpolate.interp1d(lane2[lane2_breakpoints,0], lane2[lane2_breakpoints,2], 'cubic')
+
+x_plot = np.arange(0,13)
+y_plot = lane1_interp_y(x_plot)
+# plt.plot(x_plot, y_plot)
+#plt.show()
+
+def sample_values(interpolation_x, interpolation_y, lane):
+    res = []
+    max = np.max(lane[:,0])
+    for x in range(0, int(max)):
+        res.append((float(interpolation_x(x)), float(interpolation_y(x))))
+    res.append((float(interpolation_x(max)), float(interpolation_y(max))))
+    return res
+
+sampled_lane_1 = np.array(sample_values(lane1_interp_x, lane1_interp_y, lane1))
+sampled_lane_2 = np.array(sample_values(lane2_interp_x, lane2_interp_y, lane2))
+print(lane1[lane1_breakpoints,0].shape)
+plt.plot(sampled_lane_1[:,0], sampled_lane_1[:,1])
+plt.show()
