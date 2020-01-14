@@ -1,11 +1,13 @@
 import rospy
 import numpy as np
+import math 
 from autominy_msgs.msg import SteeringAngle, NormalizedSteeringCommand, SpeedCommand, Speed
 from nav_msgs.msg import Odometry
 
 #Variables
 x = 0
 y = 0
+z = 0
 steering_angle = 0.0
 theta = 0.0
 velocity = 0.0
@@ -15,11 +17,13 @@ l = 0.27
 def callback_map(data):
     global x
     global y
-    global theta
+    global z
+    global w
     x = data.pose.pose.position.x
     y = data.pose.pose.position.y
-    #muss eigentlich auch das z in betracht ziehen in c++ wäre das 2*atan2(z,w), das würde das richtige theta geben
-    theta = np.arcsin(data.pose.pose.orientation.w) * 2
+    z = data.pose.pose.position.z
+    w = data.pose.pose.position.w
+    theta = math.atan2(z,w)
 
 def callback_steering(data):
     global steering_angle
@@ -49,7 +53,7 @@ kd = -0.2
 while  error >= 0.03:
     error = np.abs(theta - target_angle)
     u = kp * (target_angle - theta) + kd * (0.0 - velocity_angle)
-    control_signal = np.tanh(u)
+    control_signal = u
     speedPublisher.publish(value=0.2)
     steeringPublisher.publish(value=control_signal)
     i += 10
