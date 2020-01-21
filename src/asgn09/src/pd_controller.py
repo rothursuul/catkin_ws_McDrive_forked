@@ -5,9 +5,9 @@ from autominy_msgs.msg import SteeringAngle, NormalizedSteeringCommand, SpeedCom
 from nav_msgs.msg import Odometry
 
 #Variables
-x = 0
-y = 0
-z = 0
+qx = 0
+qy = 0
+qz = 0
 steering_angle = 0.0
 theta = 0.0
 velocity = 0.0
@@ -15,9 +15,9 @@ l = 0.27
 
 #Nodes and Callbacks
 def callback_map(data):
-    global x
-    global y
-    global z
+    global qx
+    global qy
+    global qz
     global w
     global theta
     x = data.pose.pose.orientation.x
@@ -48,7 +48,7 @@ rospy.sleep(2)
 # target_angle = input("Target angle: ")
 target_angle = 0
 error = np.abs(theta - target_angle)
-print(x,y,z)
+print(qx, qy, qz)
 print("theta:", theta, "steering_angle:", steering_angle, "target_angle:", target_angle, "error:", error)
 velocity_angle = velocity / l * np.tan(steering_angle)
 i = 0

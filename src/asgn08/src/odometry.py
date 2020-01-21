@@ -7,8 +7,8 @@ from nav_msgs.msg import Odometry
 velocity = 0
 phi = 0
 l = 0.27
-x = 0
-y = 0
+qx = 0
+qy = 0
 theta = 0
 res = Odometry()
 res.header.frame_id = "map"
@@ -26,8 +26,8 @@ def callback_phi(data):
     phi = data.value
 
 def callback_map(data):
-    global x
-    global y
+    global qx
+    global qy
     global theta
     x = data.pose.pose.position.x
     y = data.pose.pose.position.y
@@ -47,8 +47,8 @@ rospy.sleep(0)
 
 #Odometry Calculatio
 def odometry_callback(event):
-    global x
-    global y
+    global qx
+    global qy
     global t0
     global res
     global velocity
