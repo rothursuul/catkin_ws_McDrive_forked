@@ -12,10 +12,10 @@ class SteeringPID:
     def __init__(self, nav):
         rospy.init_node("steering_pid")
         self.steering_pub = rospy.Publisher("/actuators/steering_normalized", NormalizedSteeringCommand, queue_size=10)
-        self.speed_pub = rospy.Publisher("/actuators/speed", SpeedCommand, queue_size=10)
+        #self.speed_pub = rospy.Publisher("/actuators/speed", SpeedCommand, queue_size=10)
         self.localization_sub = rospy.Subscriber("/sensors/localization/filtered_map", Odometry, self.on_localization, queue_size=1)
         self.steering_sub = rospy.Subscriber("/control/steering", SteeringCommand, self.on_steering, queue_size=1)
-        self.speed_sub = rospy.Subscriber("/control/speed", SpeedCommand, self.on_speed_change, queue_size=1)
+        #self.speed_sub = rospy.Subscriber("/control/speed", SpeedCommand, self.on_speed_change, queue_size=1)
         self.lane_sub = rospy.Subscriber("/current_lane", Int32, self.on_lane_change, queue_size=10)
 
         self.pose = Odometry()
@@ -23,11 +23,11 @@ class SteeringPID:
         self.current_lane = None
         self.current_speed = 0.0
         self.rate = rospy.Rate(100)
-        self.timer = rospy.Timer(rospy.Duration.from_sec(0.01), self.on_control, self.on_speed_control)
+        self.timer = rospy.Timer(rospy.Duration.from_sec(0.01), self.on_control) #, self.on_speed_control)
 
         self.kp = 4.0
-        self.ki = 0.1
-        self.kd = 0.1
+        self.ki = 0.2
+        self.kd = 0.2
         self.min_i = -1.0
         self.max_i = 1.0
 
@@ -54,7 +54,7 @@ class SteeringPID:
             print("No lane specified!")
             return
 
-        lookahead_point = map.lanes[self.current_lane].lookahead_point(current_position, 0.5)
+        lookahead_point = map.lanes[self.current_lane].lookahead_point(current_position, 0.3)
         _, _, yaw = tf.transformations.euler_from_quaternion(self.quat)
         diff = (lookahead_point[0] - current_position)
         delta = math.atan2(diff[0, 1], diff[0, 0])
@@ -68,8 +68,8 @@ class SteeringPID:
     def on_steering(self, msg):
         self.desired_angle = msg.value
 
-    def on_speed_change(self, msg):
-        self.current_speed = msg.value
+    #def on_speed_change(self, msg):
+    #    self.current_speed = msg.value
 
     def on_control(self, tmr):
         if tmr.last_duration is None:
@@ -106,11 +106,11 @@ class SteeringPID:
 
         self.steering_pub.publish(steering_msg)
 
-    def on_speed_control(self, tmr):
-        if tmr.last_duration is None:
-            dt = 0.01
-        else:
-            dt = (tmr.current_expected - tmr.last_expected).to_sec()
+    #def on_speed_control(self, tmr):
+    #    if tmr.last_duration is None:
+    #        dt = 0.01
+    #    else:
+    #        dt = (tmr.current_expected - tmr.last_expected).to_sec()
 
 
 if __name__ == "__main__":
