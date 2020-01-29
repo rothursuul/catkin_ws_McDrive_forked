@@ -6,6 +6,7 @@ from autominy_msgs.msg import NormalizedSteeringCommand, SteeringCommand, SpeedC
 import tf.transformations
 import math
 from map import Lane, Map
+from lane_change import LaneChange
 
 
 class ObstacleAvoidance:
@@ -15,10 +16,12 @@ class ObstacleAvoidance:
         self.steering_pub = rospy.Publisher("/actuators/steering_normalized", NormalizedSteeringCommand, queue_size=10)
         self.localization_sub = rospy.Subscriber("/sensors/localization/filtered_map", Odometry, self.on_localization, queue_size=1)
         self.steering_sub = rospy.Subscriber("/control/steering", SteeringCommand, self.on_steering, queue_size=1)
-        self.lane_sub = rospy.Subscriber("/current_lane", Int32, self.on_lane_change, queue_size=10)
+        self.laser_scan_sub = rospy.Subscriber("/sensors/rplidar/scan", LaserScan, self.on_laser_scan, queue_size=10)
+        #self.lane_sub = rospy.Subscriber("/current_lane", Int32, self.on_lane_change, queue_size=10)
 
         self.pose = Odometry()
         self.quat = []
+        self.lanes = [0,1]
         self.current_lane = None
         self.current_speed = 0.0
         self.rate = rospy.Rate(100)
@@ -33,19 +36,21 @@ class ObstacleAvoidance:
         self.integral_error = 0.0
         self.last_error = 0.0
 
-                self.desired_angle = None
+        self.desired_angle = None
 
         self.nav = nav
 
         while not rospy.is_shutdown():
             self.rate.sleep()
 
-    def on_lane_change(self, msg):
-            self.current_lane = msg.data
+    #def on_lane_change(self, msg):
+    #    self.current_lane = msg.data
 
     def lane_nav(self):
         map = Map()
         current_position = np.array([self.pose.pose.pose.position.x, self.pose.pose.pose.position.y])
+
+        self.current_lane = self.is_obstacle
 
         if self.current_lane is None:
             print("No lane specified!")
@@ -63,8 +68,27 @@ class ObstacleAvoidance:
 
     def on_steering(self, msg):
         self.desired_angle = msg.value
+    
+    def on_laser_scan(self, msg):
+        self.scan = msg
+    
+    def is_obstacle(self):
+        self.scan_points = np.zeros((len(self.scan.ranges),2))
+        for r in range(len(self.scan.ranges)):
+            self.scan_points[r,:] = [self.scan.ranges[r] * np.cos(self.scan.angle_min + r * self.scan.angle_increment), 
+                                                        self.scan.ranges[r] * np.sin(self.scan.angle_min+ r * self.scan.angle_increment)]
+        scan_points_MapFrame =  
 
-       def on_control(self, tmr):
+        map = Map()
+        current_position = np.array([self.pose.pose.pose.position.x, self.pose.pose.pose.position.y])
+        closest_point, _ = map.lanes[self.lane].closest_point(current_position)
+        
+        if np.any(np.any((scan_points_MapFrame - clostest_points) < 0.15, axis=1)):
+            self.lane = list(self.lanes[i] for i in self.lanes if x[i] != self.lane)[0]
+        else:
+            self.lane = self.lane
+
+    def on_control(self, tmr):
         if tmr.last_duration is None:
             dt = 0.01
         else:
@@ -101,4 +125,4 @@ class ObstacleAvoidance:
 
 
 if __name__ == "__main__":
-    SteeringPID(nav=True)
+    ObstacleAvoidance(nav=True)
