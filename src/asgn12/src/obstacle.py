@@ -7,6 +7,7 @@ import tf.transformations
 import math
 from map import Lane, Map
 from lane_change import LaneChange
+import random
 
 
 class ObstacleAvoidance:
@@ -73,6 +74,8 @@ class ObstacleAvoidance:
         self.scan = msg
     
     def is_obstacle(self):
+        self.lane = random.choice(self.lanes)
+
         self.scan_points = np.zeros((len(self.scan.ranges),2))
         for r in range(len(self.scan.ranges)):
             self.scan_points[r,:] = [self.scan.ranges[r] * np.cos(self.scan.angle_min + r * self.scan.angle_increment), 
@@ -83,10 +86,13 @@ class ObstacleAvoidance:
         current_position = np.array([self.pose.pose.pose.position.x, self.pose.pose.pose.position.y])
         closest_point, _ = map.lanes[self.lane].closest_point(current_position)
         
-        if np.any(np.any((scan_points_MapFrame - clostest_points) < 0.15, axis=1)):
+        distances = np.sqrt((scan_points_MapFrame[:,0] - closest_point[0])**2 + (scan_points_MapFrame[:,1] - closest_point[1])**2)
+        if np.any(np.any(distances < 0.15, axis=1)):
             self.lane = list(self.lanes[i] for i in self.lanes if x[i] != self.lane)[0]
         else:
             self.lane = self.lane
+        
+        return self.lane
 
     def on_control(self, tmr):
         if tmr.last_duration is None:
