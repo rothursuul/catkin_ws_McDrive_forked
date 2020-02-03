@@ -79,8 +79,8 @@ class ObstacleAvoidance:
 	#calculating transformation matrix
 	current_position = np.array([self.pose.pose.pose.position.x, self.pose.pose.pose.position.y])
 	orientation_angle = 2*np.arccos(self.pose.pose.pose.orientation.w)*np.sign(self.pose.pose.pose.orientation.z)
-	trasnformation_matrix = np.array([[np.cos(), -np.sin(), 0, x],
-					[np.sin(), np.cos(), 0, y],
+	trasnformation_matrix = np.array([[np.cos(), -np.sin(), 0, current_position[0]],
+					[np.sin(), np.cos(), 0, current_position[1]],
 					[0, 0, 1, 0],
 					[0, 0, 0, 1]])
 	
@@ -95,9 +95,13 @@ class ObstacleAvoidance:
 	
 
         map = Map()
-        closest_point, _ = map.lanes[self.lane].closest_point(current_position)
+        closest_point_car, _ = map.lanes[self.lane].closest_point(current_position)
+	closest_point_scan, _ = [map.lanes[self.lane].closest_point(i) for i in scan_points_mapFrame]	
+	#closest_point_scan = np.zeros((scan_points_MapFrame.shape[0],2))
+	#for i in range(scan_points_MapFrame.shape[0]):
+	#    closest_point_scan[i,:] = map.lanes[self.lane].closest_point(scan_points_MapFrame.shape[i,:])[0]
         
-        distances = np.sqrt((scan_points_MapFrame[:,0] - closest_point[0])**2 + (scan_points_MapFrame[:,1] - closest_point[1])**2)
+        distances = np.sqrt((closest_point_scan[:,0] - closest_point_car[0])**2 + (closest_point_scan[:,1] - closest_point_car[1])**2)
         if np.any(np.any(distances < 0.15, axis=1)):
             self.lane = list(self.lanes[i] for i in self.lanes if x[i] != self.lane)[0]
         else:
