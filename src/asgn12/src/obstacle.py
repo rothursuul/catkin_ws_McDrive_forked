@@ -23,6 +23,7 @@ class ObstacleAvoidance:
         self.pose = Odometry()
         self.quat = []
         self.lanes = [0,1]
+    	self.lane = random.choice(self.lanes)
         self.current_lane = None
         self.current_speed = 0.0
         self.rate = rospy.Rate(100)
@@ -74,16 +75,26 @@ class ObstacleAvoidance:
         self.scan = msg
     
     def is_obstacle(self):
-        self.lane = random.choice(self.lanes)
+	
+	#calculating transformation matrix
+	current_position = np.array([self.pose.pose.pose.position.x, self.pose.pose.pose.position.y])
+	orientation_angle = 2*np.arccos(self.pose.pose.pose.orientation.w)*np.sign(self.pose.pose.pose.orientation.z)
+	trasnformation_matrix = np.array([[np.cos(), -np.sin(), 0, x],
+					[np.sin(), np.cos(), 0, y],
+					[0, 0, 1, 0],
+					[0, 0, 0, 1]])
+	
 
-        self.scan_points = np.zeros((len(self.scan.ranges),2))
-        for r in range(len(self.scan.ranges)):
-            self.scan_points[r,:] = [self.scan.ranges[r] * np.cos(self.scan.angle_min + r * self.scan.angle_increment), 
-                                                        self.scan.ranges[r] * np.sin(self.scan.angle_min+ r * self.scan.angle_increment)]
-        scan_points_MapFrame =  
+        self.scan_points_MapFrame = np.zeros((len(self.scan.ranges),2))
+        for r in range(len(self.scan.ranges)):		
+            scan_point = np.array([self.scan.ranges[r] * np.cos(self.scan.angle_min + r * self.scan.angle_increment), 
+				self.scan.ranges[r] * np.sin(self.scan.angle_min + r * self.scan.angle_increment), 0, 1])
+	    
+	    scan_point_MapFrame = np.dot(transformation_matrix, scan_point)
+	    self.scan_points_MapFrame[r,:] = scan_point_MapFrame[:2]	
+	
 
         map = Map()
-        current_position = np.array([self.pose.pose.pose.position.x, self.pose.pose.pose.position.y])
         closest_point, _ = map.lanes[self.lane].closest_point(current_position)
         
         distances = np.sqrt((scan_points_MapFrame[:,0] - closest_point[0])**2 + (scan_points_MapFrame[:,1] - closest_point[1])**2)
