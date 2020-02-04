@@ -11,24 +11,24 @@ class LaneChange:
         rospy.init_node("current_lane", anonymous=False)
         self.rate = rospy.Rate(10)
         self.lane_publisher = rospy.Publisher("/current_lane", Int32, queue_size=10)
-        self.laser_scan_sub = rospy.Subscriber("/sensors/rplidar/scan", LaserScan, self.on_laser_scan, queue_size=10)
-        self.localization_sub = rospy.Subscriber("/sensors/localization/filtered_map", Odometry, self.on_localization, queue_size=1)
+        self.laser_scan_sub = rospy.Subscriber("/sensors/rplidar/scan", LaserScan, self.laser_scan, queue_size=10)
+        self.localization_sub = rospy.Subscriber("/sensors/localization/filtered_map", Odometry, self.localization, queue_size=1)
 
         self.rate = rospy.Rate(100)
         self.scan = LaserScan()
         self.pose = Odometry()
         self.lanes = [0,1]
-        self.lane =  random.choice(self.lanes)
+        self.lane =  None
 
         self.timer = rospy.Timer(rospy.Duration.from_sec(0.01), self.on_control) 
      
         while not rospy.is_shutdown():
             self.rate.sleep()
 
-    def on_laser_scan(self, msg):
+    def laser_scan(self, msg):
         self.scan = msg
     
-    def on_localization(self, msg):
+    def localization(self, msg):
         self.pose = msg
 
     def is_obstacle(self):
@@ -58,10 +58,7 @@ class LaneChange:
         else:
             self.lane = self.lane
                
-        self.lane_publisher.publish(data = self.lane)
-
-        return self.lane
-        
+        self.lane_publisher.publish(data = self.lane)        
         
     
 if __name__ == "__main__":
