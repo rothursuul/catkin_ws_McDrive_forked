@@ -18,7 +18,7 @@ class LaneChange:
         self.scan = LaserScan()
         self.pose = Odometry()
         self.lanes = [0,1]
-        self.lane =  None
+        self.lane =  random.choice(self.lanes)
 
         self.timer = rospy.Timer(rospy.Duration.from_sec(0.01), self.on_control) 
      
